@@ -9,17 +9,119 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Lab 4
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r packages, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+library(broom)
+library(ggplot2)
 ```
 
-## Including Plots
+### Exploratory Data Analysis
+
+1. Create a new data frame that is a subset of diamonds that weigh 0.5 carats. 
+How many observations are in the new dataset?
+
+```{r data, include=T}
+diamonds_0.5_carat <- ggplot2::diamonds %>% 
+  filter(carat == 0.5)
+
+glimpse(diamonds_0.5_carat)
+```
+
+In the new dataset, there are 1,258 rows or diamonds that are 0.5 carats in the dataset that have 10 columns or features about those diamonds.
+
+2. When using Analysis of Variance (ANOVA) to compare group means, it is ideal to have approximately the same number of observations for each group. Which two levels of cut have the fewest number of observations? Show the code and output used to support your answer.
+
+```{r cut counts, include=T}
+diamonds_0.5_carat %>% 
+  group_by(cut) %>% 
+  tally()
+```
+
+Based on Exercise 2, the two levels of cut that have the fewest observations or 
+diamonds in the dataset is Fair with 80 diamonds and Good with 181 diamonds.
+
+3. Confirm that the variable cut was recoded as expected. Show the code and 
+output used to check the recoding.
+```{r cut combined, include=T}
+diamonds_cut_reduced <- diamonds_0.5_carat %>%
+  mutate(cut = fct_lump(cut, n = 3))
+
+diamonds_cut_reduced %>% 
+  count(cut)
+```
+
+4. Create a plot to display the relationship between cut and price. Be sure to include informative axes labels and an informative title.
+```{r cut price relationship, include=T}
+ggplot(data = diamonds_cut_reduced, aes(x = cut, y = price)) + 
+  geom_boxplot() +
+  labs(title = "Price Distrib per Cut",
+       x = "Cut",
+       y = "Price")
+```
+
+5. Calculate the number of observations along with the mean and standard deviation of price for each level of cut.
+
+```{r price statistics by cut, include=T}
+diamonds_cut_reduced %>% 
+  group_by(cut) %>% 
+  summarise(count = n(),
+            price_mean = mean(price), 
+            price_std_dev = sd(price)
+            )
+```
+
+The cut group, Very Good, in the dataset has 332 observations, a price mean of 
+1488.66 dollars and a price standard deviation of 339.36 dollars. The cut group,
+Premium, in the dataset has 277 observations, a price mean of 1531.78 dollars
+and a price standard deviation of 304.14 dollars. The cut group, Ideal, in the
+dataset has 388 observations, a price mean of 1608.67 dollars and a price 
+standard deviation of 368.34 dollars. The cut group, Other, in the dataset has
+261 combined observations, a price mean of 1340.64 dollars and a price standard
+deviation of 364.52 dollars.
+
+6. Based on the plots and summary statistics from the previous exercises , does 
+there appear to be a relationship between the cut and price for diamonds that 
+are 0.5 carats? Briefly explain your reasoning.
+
+Based on the plots and summary statistics from previous exercises, I do not
+think there appears to be a direct correlation or relationship between with cut 
+and price of diamonds of 0.5 carats. From the box plot in Exercise 4, there
+does not seem a great difference in variation where each category has around
+the same median across all cuts. Furthermore, the means from Exercise 5 are not
+far from each other with the less than one standard deviations within each other
+meaning that there is no clear correlation or relationship between cut and price.
+
+### Analysis of Variance
+
+7. When using ANOVA to compare means across groups, we make the following 
+assumptions (note how similar they are to the assumptions for regression):
+
+Normality: The distribution of the response, y, is approximately normal within 
+each category of the predictor, x - in the ith category, the y’s follow a 
+N(μi,σ2) distribution.
+
+Independence: All observations are independent from one another, i.e. one 
+observation does not affect another.
+
+Constant Variance: The distribution of the response within each category of 
+predictor, x has a common variance, σ2.
+
+Are the assumptions for ANOVA satisfied? Comment on each assumption, including 
+an explanation for your reasoning and any summary statistics and/or plots used 
+to make the conclusion.
+
+Yes, the assumptions for ANOVA are satisfied to run for this dataset of
+diamonds of carat = 0.5. First, the independence condition is satisfied since
+the selection of one diamond would not affect the selection of another diamond.
+Furthermore, I do not think data collection of diamonds would affect each other.
+Next, the 
+Lastly, the constant variance is satisfied since the standard deviation of each
+cut category is about the same. From Exercise 5, all the different cut categories
+have a standard deviation of 304-368 dollars across each cut so constant
+variance is held across all diamond cuts.
 
 You can also embed plots, for example:
 
