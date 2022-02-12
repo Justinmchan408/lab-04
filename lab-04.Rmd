@@ -113,15 +113,80 @@ Are the assumptions for ANOVA satisfied? Comment on each assumption, including
 an explanation for your reasoning and any summary statistics and/or plots used 
 to make the conclusion.
 
+```{r cut normality, include=T}
+ggplot(data = diamonds_cut_reduced, aes(x = price)) +
+  geom_histogram() +
+  facet_wrap(~cut) +
+  labs(title = "Distribution of price per cut")
+```
+
 Yes, the assumptions for ANOVA are satisfied to run for this dataset of
 diamonds of carat = 0.5. First, the independence condition is satisfied since
 the selection of one diamond would not affect the selection of another diamond.
 Furthermore, I do not think data collection of diamonds would affect each other.
-Next, the 
-Lastly, the constant variance is satisfied since the standard deviation of each
-cut category is about the same. From Exercise 5, all the different cut categories
-have a standard deviation of 304-368 dollars across each cut so constant
-variance is held across all diamond cuts.
+Next, the Normality condition is satisfied in the dataset since each of the cut
+categories is approximately Normal in being symmetrical and unimodal using the
+graph above. Lastly, the constant variance is satisfied since the standard 
+deviation of each cut category is about the same. From Exercise 5, all the 
+different cut categories have a standard deviation of 304-368 dollars across 
+each cut so constant variance is held across all diamond cuts.
+
+8. Display the ANOVA table used to examine the relationship between cut 
+and price for diamonds that are 0.5 carats.
+
+```{r model, echo=T}
+price_model <- lm(price ~ cut, data = diamonds_cut_reduced)
+anova(price_model) %>% 
+  kable(format = "markdown", digits = 3)
+```
+
+
+9. Use the ANOVA table from the previous question to calculate the sample 
+variance of price. Show the code / formula used to calculate the sample 
+variance.
+
+When thinking about calculating the sample variance of the price, I would
+want to calculate the total variation which can be calculated from class:
+$$s_y^2 = \frac{SST}{DFT} = \frac{SSB + SSR}{n - 1} = \frac{11507056 + 150706506}{1258 - 1} = 129048.18$$
+
+10. What is σ̂ 2, the estimated variance of price within each level of cut.
+σ̂2 also known as MSW, the estimated variance of the price within each level
+of cut is:
+$$MSW = \frac{SSW}{DFW} = \frac{SSW}{n - K} = \frac{150706506}{1258 - 4} = 120180.627$$
+
+11. State the null and alternative hypotheses for the test conducted using the ANOVA table in Exercise 8. State the hypotheses using both statistical notation and words in the context of the data.
+
+Statistical Notation:
+$$H_{0}: μ_{price,verygood} = μ_{price, premium} = μ_{price, ideal} = μ_{price, other}$$
+Ha: At least one of the price means for each cut selection are not equal to the 
+others.
+
+Words:
+
+Null Hypothesis: The mean price for each different cut of diamond that has a 
+carat of 0.5 is equal to each other. In other words, mean price is about the 
+same across all cuts where cut is not a factor in determining mean price.
+
+Alternative Hypothesis: The mean price for at least one cut category out of the 
+four that have a carat of 0.5 is not equal to the others. As long as one mean 
+price is different from the others, then the alternative hypothesis is true 
+which is attempting to imply that cut of diamond does play a factor in price for diamonds.
+
+12. What is your conclusion for the test specified in the previous question? 
+State the conclusion in the context of the data.
+
+We can conclude that since the p-value is approximately 0, we can reject the 
+null hypothesis that the mean prices among each cut groups are equal to each 
+other. We can say that we are statistically confident that mean prices for
+each diamond are not all equal to each other. The test assumed that the mean
+price groups were all equal and gave the probability of observing our dataset
+for diamonds with carats = 0.5 which is approximately 0. In context of the data,
+we can say that at least of the cut groups have a statistically different mean 
+price from the others where we cannot say that they all have the same mean 
+price. It looks like conditional probabilities across cuts for mean price
+differ for at least one cut group of diamonds since they do not all equal 
+each other.
+
 
 You can also embed plots, for example:
 
